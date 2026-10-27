@@ -65,7 +65,7 @@ proc compute_summary {report} {
     set worst_end ""
     foreach rec [dict get $report records] {
         lassign $rec start end slack
-                if {$slack < 0} {
+            if {$slack < 0} {
             incr violations
             set tns [expr {$tns + $slack}]
             if {$slack < $wns} {
@@ -89,7 +89,8 @@ puts "WNS: [format %.3f [dict get $summary wns]]"
 puts "TNS: [format %.3f [dict get $summary tns]]"
 puts "VIOLATIONS: [dict get $summary violations]"
 puts "WORST_PATH: [dict get $summary worst_start] -> [dict get $summary worst_end]  slack = [format %.3f [dict get $summary wns]]"
-puts "INVALID: [dict get $summary invalid]"
+puts "PATHS: [dict get $summary paths]"
+puts "INVALID: [dict get $rep invalid]"
 
 if {[dict get $rep invalid] > 0} {
     exit 2
