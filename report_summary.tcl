@@ -5,10 +5,10 @@
 ###############################################################################
 
 proc usage {} {
-    puts stderr "用法: tclsh report_summary.tcl <时序报告>"
+    puts stderr "用法: tclsh report_summary.tcl <时序报告> [outfile]"
     puts stderr "示例: tclsh report_summary.tcl fixtures/timing_normal.rpt"
 }
-if {$argc != 1} {
+if {$argc < 1 || $argc > 2} {
     usage
     exit 1
 }
@@ -80,6 +80,29 @@ proc compute_summary {report} {
                          paths [llength [dict get $report records]]]
 }
 
+proc format_row {path rep summary} {
+    set design [dict get $rep design]
+    set corner [dict get $rep corner]
+    set wns [format %.3f [dict get $summary wns]]
+    set tns [format %.3f [dict get $summary tns]]
+    set violations [dict get $summary violations]
+    set worst_start [dict get $summary worst_start]
+    set worst_end [dict get $summary worst_end]
+    set fiile [file tail $path]
+    return [list $fiile $design $corner $wns $tns $violations $worst_start $worst_end]
+}
+
+proc write_csv {outfile rows} {
+    file mkdir [file dirname $outfile]
+    set fh [open $outfile w]
+    set header [list file design corner wns tns violations worst_start worst_end]
+    puts $fh [join $header ,]
+    foreach row $rows {
+        puts $fh [join $row ,]
+    }
+    close $fh
+}
+
 set rep [parse_report $path]
 set summary [compute_summary $rep]
 puts "FILE: [file tail $path]"
@@ -91,6 +114,11 @@ puts "VIOLATIONS: [dict get $summary violations]"
 puts "WORST_PATH: [dict get $summary worst_start] -> [dict get $summary worst_end]  slack = [format %.3f [dict get $summary wns]]"
 puts "PATHS: [dict get $summary paths]"
 puts "INVALID: [dict get $rep invalid]"
+
+if {$argc >= 2} {
+     set summaryFile [lindex $argv 1] } else {
+     set summaryFile "out/summary.csv" }
+write_csv $summaryFile [list [format_row $path $rep $summary]]
 
 if {[dict get $rep invalid] > 0} {
     exit 2
