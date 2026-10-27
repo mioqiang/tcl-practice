@@ -23,22 +23,15 @@ if {[file size $path] == 0} {
     exit 1
 }
 
-
 # dict {design corner records invalid}
 proc parse_report {path}   {
     set INVALID 0
-    set PATHS 0
-    set VIOLATIONS 0
     set fh [open $path r]
     set cur_start ""
     set cur_end ""
-    set WNS 0.0
-    set TNS 0.0
-    set worst_start ""
-    set worst_end ""
     set DESIGN UNKNOWN
     set CORNER UNKNOWN
-
+    set records {}
 while {[gets $fh line] >= 0} {
     set line [string trim $line]
     if {[regexp {^Startpoint:\s+(\S+)} $line -> v]} {
@@ -48,12 +41,7 @@ while {[gets $fh line] >= 0} {
         set cur_end $v
     } elseif {[regexp {slack \((?:MET|VIOLATED)\)\s+(\S+)} $line -> v]} {
         if {$cur_start ne "" && $cur_end ne "" && [string is double -strict $v]} {
-            incr PATHS
-            if {$v < 0} {
-                incr VIOLATIONS
-                set TNS [expr {$TNS + $v}]
-                if {$v < $WNS} {set WNS $v ; set worst_start $cur_start ; set worst_end $cur_end}
-            }
+                lappend records [list $cur_start $cur_end $v]
         } else {
             incr INVALID
         }
@@ -67,16 +55,41 @@ if {$cur_start ne ""} {
     incr INVALID
 }
 close $fh
-return [dict create design $DESIGN corner $CORNER wns $WNS tns $TNS violations $VIOLATIONS worst_start $worst_start worst_end $worst_end paths $PATHS invalid $INVALID] }
+return [dict create design $DESIGN corner $CORNER records $records invalid $INVALID] }
+
+proc compute_summary {report} {
+    set wns 0.0
+    set tns 0.0
+    set violations 0
+    set worst_start ""
+    set worst_end ""
+    foreach rec [dict get $report records] {
+        lassign $rec start end slack
+            if {$slack < 0} {
+            incr violations
+            set tns [expr {$tns + $slack}]
+            if {$slack < $wns} {
+                set wns $slack
+                set worst_start $start
+                set worst_end $end
+            }
+        }
+    }
+    return [dict create wns $wns tns $tns violations $violations \
+                         worst_start $worst_start worst_end $worst_end \
+                         paths [llength [dict get $report records]]]
+}
+
 set rep [parse_report $path]
+set summary [compute_summary $rep]
 puts "FILE: [file tail $path]"
 puts "DESIGN: [dict get $rep design]"
 puts "CORNER: [dict get $rep corner]"
-puts "WNS: [format %.3f [dict get $rep wns]]"
-puts "TNS: [format %.3f [dict get $rep tns]]"
-puts "VIOLATIONS: [dict get $rep violations]"
-puts "WORST_PATH: [dict get $rep worst_start] -> [dict get $rep worst_end]  slack = [format %.3f [dict get $rep wns]]"
-puts "PATHS: [dict get $rep paths]"
+puts "WNS: [format %.3f [dict get $summary wns]]"
+puts "TNS: [format %.3f [dict get $summary tns]]"
+puts "VIOLATIONS: [dict get $summary violations]"
+puts "WORST_PATH: [dict get $summary worst_start] -> [dict get $summary worst_end]  slack = [format %.3f [dict get $summary wns]]"
+puts "PATHS: [dict get $summary paths]"
 puts "INVALID: [dict get $rep invalid]"
 
 if {[dict get $rep invalid] > 0} {
