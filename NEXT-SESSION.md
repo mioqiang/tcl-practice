@@ -1,27 +1,30 @@
 # 新会话开场提示词（复制这段给新的 AI 会话）
 
-我在做 **W4 的 Tcl 练习**（EDA 报告解析器 v1），项目在 `C:\Users\jyd10\Desktop\question\tcl-practice`。
+我在做 **W4 收尾 + W5 SystemVerilog 入门**。Tcl 项目在 `C:\Users\jyd10\Desktop\question\tcl-practice`。
 
 **请先读这几个文件，不要让我重新贴代码：**
-- `tcl-practice/README.md`（总说明、数据格式、输出契约、**实测记录**、12 条 bug 记录）
-- `tcl-practice/CHEATSHEET.md`（我的语法速查 + 我反复犯的错，已 17 条）
-- `tcl-practice/NEXT-SESSION.md` 下面的「当前进度」和「W4 清单」
-- 周表 `C:\Users\jyd10\Desktop\codex\codex_重排逐周表_W2-W22_后端主攻.md` 里的 `W4 · 10.19-10.25` 一节
+- `tcl-practice/NEXT-SESSION.md` 的「当前进度」+「W4 清单」（最重要，10 行看完当前状态）
+- `tcl-practice/CHEATSHEET.md`（语法速查 + 21 条反复犯的错，重点看 18-21）
+- `tcl-practice/README.md`（数据格式、输出契约 `:259-273`、实测记录、bug 记录）
+- 周表 `C:\Users\jyd10\Desktop\codex\codex_重排逐周表_W2-W22_后端主攻.md` 的 `W4` 与 `W5 · 10.26-11.01` 两节
 
-**我的代码状态（W3 已完成，这两个脚本能跑，不要再从零写）：**
-- `log_summary.tcl`、`report_summary.tcl` 都在 `tcl-practice/` 根目录
-- `tests/run_tests.tcl` 的 `:104` 和 `:124` 已指向 `$root`，实测 **PASS: 19  FAIL: 0**
-- 两个脚本的实测输出和预期值都在 README 的「实测记录」小节
+**我的代码与仓库状态（不要从零写）：**
+- `git` 已建（10/27）：`main` = **PASS: 19  FAIL: 0**，三份 fixture 输出与 W3 基线**逐字节一致**
+- `wip/w4-tcl` = 半成品：`compute_summary` 已拆出，**只差 2 处**（哪 2 处写在下面「当前进度」）
+- `report_summary.tcl` 已有 `parse_report` / `compute_summary`；`write_csv` 还没写
+- 测试：`python ..\tools\tclsh.py tests\run_tests.tcl` → 期望 19/0
+- 回归基线：`C:\Users\jyd10\Desktop\question\.w4-baseline\timing_*.txt`，用 `fc.exe` 比，**判据是退出码**（`fc` 无差异时也返回 0 并打印提示，别按“有没有输出”判断）
 
 **我的环境：**
-- Windows，VS Code（装在 `D:\Microsoft VS Code`），Tcl 扩展 `bitwisecook.tcl-lsp`
-- 没有 tclsh，用 `python ..\tools\tclsh.py <脚本> [参数]` 跑（工作目录是 `tcl-practice`）
+- Windows，VS Code（`D:\Microsoft VS Code`），Tcl 扩展 `bitwisecook.tcl-lsp`
+- 没有 tclsh：`python ..\tools\tclsh.py <脚本> [参数]`（工作目录 `tcl-practice`）
+- SV 仿真器（iverilog/verilator）在 10/27 下午配，装好后把版本号补进这一行：`SV: 待填`
 
 **我的学习方式（重要，请遵守）：**
 - **我自己写代码，你不要直接给答案**；给我语法用法、思路提示、验收标准
 - 我卡住时会贴报错或输出，你帮我定位根因（尽量用可运行的最小演示验证，别只讲理论）
 - 每次改完我要 `Ctrl+S` 保存——报错和我贴的代码对不上时请先怀疑这个
-- 我贴输出时，你按 `tests/run_tests.tcl` 的断言和 README 的期望值验收
+- 我贴输出时，你按 `tests/run_tests.tcl` 的断言、README 的期望值和基线 `fc` 结果验收
 
 **我反复犯的错（请主动提醒）：**
 1. 忘记保存，导致报错和屏幕上的代码对不上
@@ -29,20 +32,24 @@
 3. `if{` / `expr{` / `}else{` 缺空格
 4. 整数除法（`*5/9` 应为 `*5.0/9.0`）
 5. 正则里 `\s` 应为 `\s+`（多个空格会错位）
-6. 正则用**双引号**包 → 反斜杠被吃掉（`"\d"` 变 `d`），一律用 `{}`
-7. 正则里写 `{\S+}` —— 花括号是元字符，变成要求日志里真有 `{ }`
-8. `exit` 写进循环 → 进程提前终止，`puts` 一行都不执行
+6. 正则用**双引号**包 → 反斜杠被吃掉，一律用 `{}`
+7. 正则里写 `{\S+}` —— 花括号是元字符
+8. `exit` 写进循环 → 进程提前终止
 9. 契约字段名大小写不一致（`WORST_path` vs `WORST_PATH`）
+10. 命令名写错时报错会伪装成 `expected boolean value` → 先看 `catch` 的 `-errorinfo` 里 `invoked from within`
+11. `[]` 里的换行是**命令分隔符**，不是续行 → 一行写完，或用 `\`（`\` 后不能有空格）
+12. 粘贴 `set` 前确认光标在**顶层**，别落进别的 proc（会变成那个 proc 的局部变量）
+13. `dict get` 缺键 = **报错**；`report` 4 键（design/corner/records/invalid）、`summary` 6 键（wns/tns/violations/worst_start/worst_end/paths），别取错对象
 
-**W4 我要做的（按顺序，别跳）：**
-1. 把 `report_summary.tcl` 拆成 `parse_report` / `compute_summary` / `write_csv` 三个 proc
-2. 学并使用 `dict`、嵌套 list、`lsort -command`、`format`、`source`
-3. 支持批量读目录（`glob *.rpt`）+ CSV/Markdown 汇总输出
-4. 准备 5-10 条格式变体（带单位 `-0.483ns`、`Slack` 大小写、缺字段），证明解析器不会静默算错
-5. 写 `parser-design.md`：输入假设、正则、数据结构、已知限制
-6. 自动测试补到 5 个以上（正常 / 无违例 / 负 slack / 字段缺失 / 文件不存在）
+**现在要做的（按顺序）：**
+1. **20 min**：`git switch wip/w4-tcl` → 改 2 处 → 19/0 + 三份 `fc_exit` 全 0 → commit → 合回 `main`
+2. **45 min**：`write_csv` + CSV 落盘（列名见 README `:280`）
+3. **30 min**：批量 `glob`（目录入口，`report_summary.tcl fixtures` 一次出 3 份）
+4. **25 min**：3 条格式变体 + 在 `run_tests.tcl` 补断言
+5. **20 min**：`parser-design.md`（输入假设 / 正则 / 两张 dict 键表 / 已知限制）
+6. 之后全投 **W5 SV**：环境 → 参数化 MUX → 译码器 → 计数器 → 移位寄存器，每个模块配 `$error`/`$fatal` 自检 TB
 
-**本周明确不做**（计划表已顺延）：Tk GUI、OOP 扩展、namespace 深挖、真实 OpenROAD 报告适配（除非环境现成）。
+**本周明确不做**：Markdown 输出、Tk GUI、OOP 扩展、namespace 深挖、真实 OpenROAD 报告适配、另一套验证环境。
 
 **当前进度：**（每天更新这一行，2026-10-27 15:00 更新）
 - W3 全部完成（`log_summary` + `report_summary` + 19 条断言，两处 `set script` 指向 `$root`）
