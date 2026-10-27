@@ -1,0 +1,60 @@
+{
+  // 一键跑测试：Ctrl+Shift+B（默认生成任务）
+  // 依赖解释器查找顺序：PATH 里的 tclsh -> 回退到 ../tools/tclsh.py
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Tcl: 运行自动测试 (run_tests.tcl)",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "${workspaceFolder}/../tools/tclsh.py",
+        "${workspaceFolder}/tests/run_tests.tcl"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": { "kind": "build", "isDefault": true },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Tcl: 运行当前文件",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "${workspaceFolder}/../tools/tclsh.py",
+        "${file}"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Tcl: 解析日志 fixture",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "${workspaceFolder}/../tools/tclsh.py",
+        "${workspaceFolder}/solutions/log_summary.tcl",
+        "${workspaceFolder}/fixtures/test_run.log"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "Tcl: 解析时序报告 fixture",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "${workspaceFolder}/../tools/tclsh.py",
+        "${workspaceFolder}/solutions/report_summary.tcl",
+        "${workspaceFolder}/fixtures/timing_normal.rpt",
+        "${workspaceFolder}/fixtures/timing_clean.rpt",
+        "${workspaceFolder}/fixtures/timing_malformed.rpt"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": []
+    }
+  ]
+}

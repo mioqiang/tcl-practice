@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "bitwisecook.tcl-lsp"
+  ],
+  "unwantedRecommendations": [
+    "rashwell.tcl",
+    "bitwisecook.tcl",
+    "bkromhout.vscode-tcl"
+  ]
+}

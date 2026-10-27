@@ -1,0 +1,31 @@
+# mock / 练习数据 —— 这是我自己编的测试日志，不是任何真实仿真器的输出
+# 字段含义：
+#   col1 = 日期  col2 = 时间  col3 = 级别(INFO/WARN/ERROR)
+#   col4 = 用例名(tc_*)   col5 = 结果(PASS/FAIL)   col6 = 耗时(ms)
+# 第 18 行故意写错：结果字段是 SKIP，用来测试解析器遇到未知状态时的反应。
+
+2026-10-15 09:12:03 INFO  tc_reset_smoke         PASS  12
+2026-10-15 09:12:04 INFO  tc_reset_smoke         PASS  11
+2026-10-15 09:12:06 INFO  tc_fifo_write_read     PASS  45
+2026-10-15 09:12:08 INFO  tc_fifo_empty_read     PASS  33
+2026-10-15 09:12:11 WARN  tc_fifo_full_write     PASS  88
+2026-10-15 09:12:13 ERROR tc_fifo_overflow       FAIL  120
+2026-10-15 09:12:15 INFO  tc_uart_tx_frame       PASS  210
+2026-10-15 09:12:17 INFO  tc_uart_rx_frame       PASS  205
+2026-10-15 09:12:19 ERROR tc_uart_baud_mismatch  FAIL  340
+2026-10-15 09:12:21 INFO  tc_uart_parity_error   PASS  198
+2026-10-15 09:12:23 WARN  tc_crc_single_bit     PASS  76
+2026-10-15 09:12:25 ERROR tc_crc_double_bit     FAIL  81
+2026-10-15 09:12:27 INFO  tc_crc_all_zero       PASS  64
+2026-10-15 09:12:29 INFO  tc_axil_reg_read      PASS  52
+2026-10-15 09:12:31 INFO  tc_axil_reg_write     PASS  55
+2026-10-15 09:12:33 INFO  tc_axil_backpressure  PASS  97
+2026-10-15 09:12:35 ERROR tc_axil_illegal_addr  FAIL  61
+2026-10-15 09:12:37 INFO  tc_dma_burst_256      SKIP  0
+2026-10-15 09:12:40 INFO  tc_timeout_recovery   PASS  420
+2026-10-15 09:12:42 INFO  tc_reset_smoke         PASS  10
+2026-10-15 09:12:44 INFO  tc_fifo_write_read     PASS  44
+2026-10-15 09:13:01 ERROR tc_fifo_overflow       FAIL  118
+2026-10-15 09:13:05 INFO  tc_uart_tx_frame       PASS  208
+2026-10-15 09:13:09 WARN  tc_crc_single_bit     PASS  79
+2026-10-15 09:13:12 INFO  tc_axil_reg_read      PASS  53

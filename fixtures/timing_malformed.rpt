@@ -1,0 +1,109 @@
+################################################################################
+#  mock / 练习数据 —— 不要用于任何真实项目结论
+#  这份文件是「坏数据」，专门用来测试你的解析器的容错能力。
+#  已知问题（写完代码后再回来看，不要提前看）：
+#    (1) 第 3 条路径的 slack 值不是数字；
+#    (2) 第 4 条路径缺少 Endpoint 字段；
+#    (3) 第 5 条路径缺少 slack 行。
+#  正确行为：解析器必须报错或跳过并统计「无效路径数」，退出码非 0，
+#  绝对不能把 (2) 的空字段当成合法起点/终点，也不能把 (1) 的字符串当成 slack。
+################################################################################
+
+Startpoint: u_uart/reg_tx_q[0]
+            (rising edge-triggered flip-flop clocked by clk)
+Endpoint:   u_uart/reg_tx_q[1]
+            (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type:  max
+
+  Point                                          Incr       Path
+  ------------------------------------------------------------
+  clock clk (rise edge)                          0.000      0.000
+  u_uart/reg_tx_q[0]/Q  (DFFRQ_X1)               0.301      0.301 f
+  u_uart/u_shift/U004/Z (NAND2_X1)               0.244      0.545 r
+  u_uart/reg_tx_q[1]/D (DFFRQ_X1)                0.041      0.586 r
+  data arrival time                                         0.586
+  ------------------------------------------------------------
+  data required time                                        9.601
+  data arrival time                                        -0.586
+  ------------------------------------------------------------
+  slack (MET)                                                9.015
+
+Startpoint: u_uart/reg_rx_q[4]
+            (rising edge-triggered flip-flop clocked by clk)
+Endpoint:   u_uart/u_fifo/mem_reg[5][2]
+            (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type:  max
+
+  Point                                          Incr       Path
+  ------------------------------------------------------------
+  clock clk (rise edge)                          0.000      0.000
+  u_uart/reg_rx_q[4]/Q  (DFFRQ_X1)               0.352      0.352 f
+  u_uart/u_fifo/u_wr/U021/Z (AND2_X1)            0.298      0.650 r
+  u_uart/u_fifo/mem_reg[5][2]/D (DFFRQ_X2)       0.052      0.702 r
+  data arrival time                                         0.702
+  ------------------------------------------------------------
+  data required time                                        9.595
+  data arrival time                                        -0.702
+  ------------------------------------------------------------
+  slack (MET)                                                8.893
+
+Startpoint: u_uart/reg_div_q[9]
+            (rising edge-triggered flip-flop clocked by clk)
+Endpoint:   u_uart/reg_tick_q
+            (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type:  max
+
+  Point                                          Incr       Path
+  ------------------------------------------------------------
+  clock clk (rise edge)                          0.000      0.000
+  u_uart/reg_div_q[9]/Q  (DFFRQ_X1)              0.411      0.411 f
+  u_uart/u_div/U087/Z (ADDH_X1)                  0.366      0.777 r
+  u_uart/reg_tick_q/D (DFFRQ_X1)                 0.048      0.825 r
+  data arrival time                                         0.825
+  ------------------------------------------------------------
+  data required time                                        9.583
+  data arrival time                                        -0.825
+  ------------------------------------------------------------
+  slack (VIOLATED)                                           N/A
+
+Startpoint: u_uart/reg_ctrl_q[1]
+            (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type:  max
+
+  Point                                          Incr       Path
+  ------------------------------------------------------------
+  clock clk (rise edge)                          0.000      0.000
+  u_uart/reg_ctrl_q[1]/Q  (DFFRQ_X1)             0.288      0.288 f
+  u_uart/u_mux/U013/Z (MUX2_X1)                  0.317      0.605 r
+  u_uart/reg_stat_q[0]/D (DFFRQ_X1)              0.039      0.644 r
+  data arrival time                                         0.644
+  ------------------------------------------------------------
+  data required time                                        9.588
+  data arrival time                                        -0.644
+  ------------------------------------------------------------
+  slack (MET)                                                8.944
+
+Startpoint: u_uart/reg_baud_q[2]
+            (rising edge-triggered flip-flop clocked by clk)
+Endpoint:   u_uart/reg_baud_q[3]
+            (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type:  max
+
+  Point                                          Incr       Path
+  ------------------------------------------------------------
+  clock clk (rise edge)                          0.000      0.000
+  u_uart/reg_baud_q[2]/Q  (DFFRQ_X1)             0.333      0.333 f
+  u_uart/u_baud/U055/Z (NOR2_X1)                 0.291      0.624 r
+  u_uart/reg_baud_q[3]/D (DFFRQ_X1)              0.045      0.669 r
+  data arrival time                                         0.669
+  ------------------------------------------------------------
+  data required time                                        9.592
+
+################################################################################
+#  end of report (mock, malformed)
+################################################################################

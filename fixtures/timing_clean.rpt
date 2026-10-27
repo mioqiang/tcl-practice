@@ -1,0 +1,127 @@
+################################################################################
+#  mock / 练习数据 —— 不要用于任何真实项目结论
+#  设计: fifo_sync_top   工艺角: fast_0c_1v32   时钟周期: 8.0 ns
+#  本文件故意设计为「无时序违例」：所有 slack 均为正，用于测试 WNS=0 场景。
+#  注意：只看 slack 字段，不要在解析器里硬编码路径条数。
+################################################################################
+
+Startpoint: u_fifo/wptr_q[1]
+            (rising edge-triggered flip-flop clocked by clk)
+Endpoint:   u_fifo/wptr_q[2]
+            (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type:  max
+
+  Point                                          Incr       Path
+  ------------------------------------------------------------
+  clock clk (rise edge)                          0.000      0.000
+  clock network delay (ideal)                    0.000      0.000
+  u_fifo/wptr_q[1]/CK (DFFRQ_X1)                 0.000      0.000 r
+  u_fifo/wptr_q[1]/Q  (DFFRQ_X1)                 0.152      0.152 f
+  u_fifo/u_gray/U012/Z (XOR2_X1)                 0.118      0.270 r
+  u_fifo/wptr_q[2]/D (DFFRQ_X1)                  0.031      0.301 r
+  data arrival time                                         0.301
+  ------------------------------------------------------------
+  clock clk (rise edge)                          8.000      8.000
+  clock network delay (ideal)                    0.000      8.000
+  clock uncertainty                             -0.120      7.880
+  u_fifo/wptr_q[2]/CK (DFFRQ_X1)                 0.000      7.880 r
+  library setup time                            -0.198      7.682
+  data required time                                        7.682
+  ------------------------------------------------------------
+  data required time                                        7.682
+  data arrival time                                        -0.301
+  ------------------------------------------------------------
+  slack (MET)                                                7.381
+
+Startpoint: u_fifo/mem_reg[12][3]
+            (rising edge-triggered flip-flop clocked by clk)
+Endpoint:   u_fifo/rdata_q[3]
+            (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type:  max
+
+  Point                                          Incr       Path
+  ------------------------------------------------------------
+  clock clk (rise edge)                          0.000      0.000
+  clock network delay (ideal)                    0.000      0.000
+  u_fifo/mem_reg[12][3]/CK (DFFRQ_X2)            0.000      0.000 r
+  u_fifo/mem_reg[12][3]/Q  (DFFRQ_X2)            0.421      0.421 f
+  u_fifo/u_rdmux/U031/Z (MUX2_X1)                0.264      0.685 r
+  u_fifo/rdata_q[3]/D (DFFRQ_X2)                 0.047      0.732 r
+  data arrival time                                         0.732
+  ------------------------------------------------------------
+  clock clk (rise edge)                          8.000      8.000
+  clock network delay (ideal)                    0.000      8.000
+  clock uncertainty                             -0.120      7.880
+  u_fifo/rdata_q[3]/CK (DFFRQ_X2)                0.000      7.880 r
+  library setup time                            -0.211      7.669
+  data required time                                        7.669
+  ------------------------------------------------------------
+  data required time                                        7.669
+  data arrival time                                        -0.732
+  ------------------------------------------------------------
+  slack (MET)                                                6.937
+
+Startpoint: u_ctrl/state_q[2]
+            (rising edge-triggered flip-flop clocked by clk)
+Endpoint:   u_ctrl/count_q[4]
+            (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type:  max
+
+  Point                                          Incr       Path
+  ------------------------------------------------------------
+  clock clk (rise edge)                          0.000      0.000
+  clock network delay (ideal)                    0.000      0.000
+  u_ctrl/state_q[2]/CK (DFFRQ_X1)                0.000      0.000 r
+  u_ctrl/state_q[2]/Q  (DFFRQ_X1)                0.233      0.233 f
+  u_ctrl/u_nxt/U055/Z (OAI21_X1)                 0.312      0.545 r
+  u_ctrl/u_inc/U019/Z (ADDH_X1)                  0.276      0.821 r
+  u_ctrl/count_q[4]/D (DFFRQ_X1)                 0.038      0.859 r
+  data arrival time                                         0.859
+  ------------------------------------------------------------
+  clock clk (rise edge)                          8.000      8.000
+  clock network delay (ideal)                    0.000      8.000
+  clock uncertainty                             -0.120      7.880
+  u_ctrl/count_q[4]/CK (DFFRQ_X1)                0.000      7.880 r
+  library setup time                            -0.203      7.677
+  data required time                                        7.677
+  ------------------------------------------------------------
+  data required time                                        7.677
+  data arrival time                                        -0.859
+  ------------------------------------------------------------
+  slack (MET)                                                6.818
+
+Startpoint: u_fifo/mem_reg[3][0]
+            (rising edge-triggered flip-flop clocked by clk)
+Endpoint:   u_fifo/rdata_q[0]
+            (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type:  max
+
+  Point                                          Incr       Path
+  ------------------------------------------------------------
+  clock clk (rise edge)                          0.000      0.000
+  clock network delay (ideal)                    0.000      0.000
+  u_fifo/mem_reg[3][0]/CK (DFFRQ_X2)             0.000      0.000 r
+  u_fifo/mem_reg[3][0]/Q  (DFFRQ_X2)             0.437      0.437 f
+  u_fifo/u_rdmux/U008/Z (MUX2_X1)                0.251      0.688 r
+  u_fifo/rdata_q[0]/D (DFFRQ_X2)                 0.044      0.732 r
+  data arrival time                                         0.732
+  ------------------------------------------------------------
+  clock clk (rise edge)                          8.000      8.000
+  clock network delay (ideal)                    0.000      8.000
+  clock uncertainty                             -0.120      7.880
+  u_fifo/rdata_q[0]/CK (DFFRQ_X2)                0.000      7.880 r
+  library setup time                            -0.216      7.664
+  data required time                                        7.664
+  ------------------------------------------------------------
+  data required time                                        7.664
+  data arrival time                                        -0.732
+  ------------------------------------------------------------
+  slack (MET)                                                6.932
+
+################################################################################
+#  end of report (mock) —— 无违例
+################################################################################

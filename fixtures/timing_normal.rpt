@@ -1,0 +1,188 @@
+################################################################################
+#  mock / 练习数据 —— 不要用于任何真实项目结论
+#  由练习者手写，用于训练 Tcl 报告解析；非真实工具输出。
+#  设计: timer_uart_top   工艺角: slow_125c_1v08   时钟周期: 10.0 ns
+#  格式参考 OpenSTA / PrimeTime 的 report_checks 风格，字段已简化。
+################################################################################
+
+Startpoint: u_core/reg_sample_q[7]
+            (rising edge-triggered flip-flop clocked by clk)
+Endpoint:   u_core/reg_shift_q[3]
+            (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type:  max
+
+  Point                                          Incr       Path
+  ------------------------------------------------------------
+  clock clk (rise edge)                          0.000      0.000
+  clock network delay (ideal)                    0.000      0.000
+  u_core/reg_sample_q[7]/CK (DFFRQ_X2)           0.000      0.000 r
+  u_core/reg_sample_q[7]/Q  (DFFRQ_X2)           0.312      0.312 f
+  u_core/u_alu/U152/Z (NAND2_X1)                 0.184      0.496 r
+  u_core/u_alu/U187/Z (NOR2_X2)                  0.221      0.717 f
+  u_core/reg_shift_q[3]/D (DFFRQ_X2)             0.048      0.765 f
+  data arrival time                                         0.765
+  ------------------------------------------------------------
+  clock clk (rise edge)                         10.000     10.000
+  clock network delay (ideal)                    0.000     10.000
+  clock uncertainty                             -0.150      9.850
+  u_core/reg_shift_q[3]/CK (DFFRQ_X2)            0.000      9.850 r
+  library setup time                            -0.267      9.583
+  data required time                                        9.583
+  ------------------------------------------------------------
+  data required time                                        9.583
+  data arrival time                                        -0.765
+  ------------------------------------------------------------
+  slack (MET)                                                8.818
+
+Startpoint: u_core/reg_shift_q[0]
+            (rising edge-triggered flip-flop clocked by clk)
+Endpoint:   u_core/reg_shift_q[5]
+            (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type:  max
+
+  Point                                          Incr       Path
+  ------------------------------------------------------------
+  clock clk (rise edge)                          0.000      0.000
+  clock network delay (ideal)                    0.000      0.000
+  u_core/reg_shift_q[0]/CK (DFFRQ_X2)            0.000      0.000 r
+  u_core/reg_shift_q[0]/Q  (DFFRQ_X2)            0.354      0.354 f
+  u_core/u_crc/U089/Z (XOR2_X1)                  0.402      0.756 r
+  u_core/u_crc/U114/Z (AND2_X1)                  0.288      1.044 f
+  u_core/u_crc/U143/Z (OAI21_X1)                 0.196      1.240 r
+  u_core/reg_shift_q[5]/D (DFFRQ_X2)             0.061      1.301 r
+  data arrival time                                         1.301
+  ------------------------------------------------------------
+  clock clk (rise edge)                         10.000     10.000
+  clock network delay (ideal)                    0.000     10.000
+  clock uncertainty                             -0.150      9.850
+  u_core/reg_shift_q[5]/CK (DFFRQ_X2)            0.000      9.850 r
+  library setup time                            -0.255      9.595
+  data required time                                        9.595
+  ------------------------------------------------------------
+  data required time                                        9.595
+  data arrival time                                        -1.301
+  ------------------------------------------------------------
+  slack (VIOLATED)                                          -0.483
+
+Startpoint: u_pack/cnt_pack_q[2]
+            (rising edge-triggered flip-flop clocked by clk)
+Endpoint:   u_core/reg_shift_q[1]
+            (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type:  max
+
+  Point                                          Incr       Path
+  ------------------------------------------------------------
+  clock clk (rise edge)                          0.000      0.000
+  clock network delay (ideal)                    0.000      0.000
+  u_pack/cnt_pack_q[2]/CK (DFFRQ_X1)             0.000      0.000 r
+  u_pack/cnt_pack_q[2]/Q  (DFFRQ_X1)             0.388      0.388 f
+  u_pack/u_add/U021/Z (ADDH_X1)                  0.341      0.729 r
+  u_pack/u_add/U044/Z (NAND2_X1)                 0.226      0.955 f
+  u_core/reg_shift_q[1]/D (DFFRQ_X2)             0.052      1.007 f
+  data arrival time                                         1.007
+  ------------------------------------------------------------
+  clock clk (rise edge)                         10.000     10.000
+  clock network delay (ideal)                    0.000     10.000
+  clock uncertainty                             -0.150      9.850
+  u_core/reg_shift_q[1]/CK (DFFRQ_X2)            0.000      9.850 r
+  library setup time                            -0.249      9.601
+  data required time                                        9.601
+  ------------------------------------------------------------
+  data required time                                        9.601
+  data arrival time                                        -1.007
+  ------------------------------------------------------------
+  slack (VIOLATED)                                          -0.212
+
+Startpoint: u_core/reg_sample_q[2]
+            (rising edge-triggered flip-flop clocked by clk)
+Endpoint:   u_pack/dout_q[9]
+            (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type:  max
+
+  Point                                          Incr       Path
+  ------------------------------------------------------------
+  clock clk (rise edge)                          0.000      0.000
+  clock network delay (ideal)                    0.000      0.000
+  u_core/reg_sample_q[2]/CK (DFFRQ_X2)           0.000      0.000 r
+  u_core/reg_sample_q[2]/Q  (DFFRQ_X2)           0.298      0.298 f
+  u_pack/u_xor/U011/Z (XOR2_X1)                  0.372      0.670 r
+  u_pack/dout_q[9]/D (DFFRQ_X1)                  0.058      0.728 r
+  data arrival time                                         0.728
+  ------------------------------------------------------------
+  clock clk (rise edge)                         10.000     10.000
+  clock network delay (ideal)                    0.000     10.000
+  clock uncertainty                             -0.150      9.850
+  u_pack/dout_q[9]/CK (DFFRQ_X1)                 0.000      9.850 r
+  library setup time                            -0.262      9.588
+  data required time                                        9.588
+  ------------------------------------------------------------
+  data required time                                        9.588
+  data arrival time                                        -0.728
+  ------------------------------------------------------------
+  slack (VIOLATED)                                          -0.062
+
+Startpoint: u_cfg/reg_ctrl_q[4]
+            (rising edge-triggered flip-flop clocked by clk)
+Endpoint:   u_cfg/reg_stat_q[2]
+            (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type:  max
+
+  Point                                          Incr       Path
+  ------------------------------------------------------------
+  clock clk (rise edge)                          0.000      0.000
+  clock network delay (ideal)                    0.000      0.000
+  u_cfg/reg_ctrl_q[4]/CK (DFFRQ_X1)              0.000      0.000 r
+  u_cfg/reg_ctrl_q[4]/Q  (DFFRQ_X1)              0.277      0.277 f
+  u_cfg/u_dec/U007/Z (NOR2_X1)                   0.163      0.440 r
+  u_cfg/reg_stat_q[2]/D (DFFRQ_X1)               0.044      0.484 r
+  data arrival time                                         0.484
+  ------------------------------------------------------------
+  clock clk (rise edge)                         10.000     10.000
+  clock network delay (ideal)                    0.000     10.000
+  clock uncertainty                             -0.150      9.850
+  u_cfg/reg_stat_q[2]/CK (DFFRQ_X1)              0.000      9.850 r
+  library setup time                            -0.258      9.592
+  data required time                                        9.592
+  ------------------------------------------------------------
+  data required time                                        9.592
+  data arrival time                                        -0.484
+  ------------------------------------------------------------
+  slack (MET)                                                9.108
+
+Startpoint: u_cfg/reg_mode_q[1]
+            (rising edge-triggered flip-flop clocked by clk)
+Endpoint:   u_pack/dout_q[2]
+            (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type:  max
+
+  Point                                          Incr       Path
+  ------------------------------------------------------------
+  clock clk (rise edge)                          0.000      0.000
+  clock network delay (ideal)                    0.000      0.000
+  u_cfg/reg_mode_q[1]/CK (DFFRQ_X1)              0.000      0.000 r
+  u_cfg/reg_mode_q[1]/Q  (DFFRQ_X1)              0.249      0.249 f
+  u_pack/u_mux/U003/Z (MUX2_X1)                  0.301      0.550 r
+  u_pack/dout_q[2]/D (DFFRQ_X1)                  0.049      0.599 r
+  data arrival time                                         0.599
+  ------------------------------------------------------------
+  clock clk (rise edge)                         10.000     10.000
+  clock network delay (ideal)                    0.000     10.000
+  clock uncertainty                             -0.150      9.850
+  u_pack/dout_q[2]/CK (DFFRQ_X1)                 0.000      9.850 r
+  library setup time                            -0.271      9.579
+  data required time                                        9.579
+  ------------------------------------------------------------
+  data required time                                        9.579
+  data arrival time                                        -0.599
+  ------------------------------------------------------------
+  slack (MET)                                                8.980
+
+################################################################################
+#  end of report (mock)
+################################################################################

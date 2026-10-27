@@ -1,0 +1,21 @@
+# mock / 练习数据 —�?这是我自己编的测试日志，不是任何真实仿真器的输出
+# 字段含义�?#   col1 = 日期  col2 = 时间  col3 = 级别(INFO/WARN/ERROR)
+2026-10-15 09:12:03 INFO  tc_reset_smoke         PASS  12
+2026-10-15 09:12:04 INFO  tc_reset_smoke         PASS  11
+2026-10-15 09:12:06 INFO  tc_fifo_write_read     PASS  45
+2026-10-15 09:12:08 INFO  tc_fifo_empty_read     PASS  33
+2026-10-15 09:12:11 WARN  tc_fifo_full_write     PASS  88
+2026-10-15 09:12:15 INFO  tc_uart_tx_frame       PASS  210
+2026-10-15 09:12:17 INFO  tc_uart_rx_frame       PASS  205
+2026-10-15 09:12:21 INFO  tc_uart_parity_error   PASS  198
+2026-10-15 09:12:23 WARN  tc_crc_single_bit     PASS  76
+2026-10-15 09:12:27 INFO  tc_crc_all_zero       PASS  64
+2026-10-15 09:12:29 INFO  tc_axil_reg_read      PASS  52
+2026-10-15 09:12:31 INFO  tc_axil_reg_write     PASS  55
+2026-10-15 09:12:33 INFO  tc_axil_backpressure  PASS  97
+2026-10-15 09:12:40 INFO  tc_timeout_recovery   PASS  420
+2026-10-15 09:12:42 INFO  tc_reset_smoke         PASS  10
+2026-10-15 09:12:44 INFO  tc_fifo_write_read     PASS  44
+2026-10-15 09:13:05 INFO  tc_uart_tx_frame       PASS  208
+2026-10-15 09:13:09 WARN  tc_crc_single_bit     PASS  79
+2026-10-15 09:13:12 INFO  tc_axil_reg_read      PASS  53
