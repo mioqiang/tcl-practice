@@ -168,6 +168,61 @@ puts "WORST_PATH: $worst_start -> $end"     ✅
 因为 Tcl **逐条执行**，语法错误只在那一条被执行时才触发。
 **动作**：长 `puts` 写完后数一遍引号，必须是偶数且两两配对。
 
+### 18. 命令名写错 → 报错却说「expected boolean value」 ⭐⭐⭐
+
+**证据**（10/26）：把设计草图 `parse_report(path) -> dict {...} {` 当代码贴进 `report_summary.tcl:28`，
+报错是 `expected boolean value but got "parse_report(path)"`，**和真实原因毫无关系**。
+
+**根因**：那整行被当成**一条命令的名字**；命令不存在时，这个解释器的 `unknown` 过程
+内部拿命令名去 `if {$msg}`，于是报“需要布尔值”。
+
+**诊断**：别读报错文字，用 `catch` 看错误栈：
+
+```tcl
+set rc [catch {危险代码} msg opts]
+puts [dict get $opts -errorinfo]     ;# 找 "invoked from within" 那一行，它就是元凶原样
+```
+
+**预防**：设计草图放注释里（`#` 必须在行首），别直接粘进代码。
+
+### 19. `[]` 里的换行是命令分隔符，不是续行 ⭐⭐⭐
+
+```tcl
+return [dict create a 1 b 2
+             c 3]                    ❌ 第二行变成新命令 c，报 "boolean"/"invalid command name"
+return [dict create a 1 b 2 c 3]     ✅ 一行写完（推荐）
+return [dict create a 1 \
+             b 2]                    ✅ \ 续行，但 \ 后面不能有空格
+```
+
+**证据**（10/27）：`return [dict create ... violations $VIOLATIONS` 换行写 `worst_start ...]`，
+报 `expected boolean value but got "worst_start"`。和 #18 同一个机制。
+
+**预防**：命令替换里**一律一行写完**；必须换行时用 `\`，且写完检查 `\` 后没有空格。
+
+### 20. 粘贴位置：`set` 落进了不该进的 proc ⭐⭐
+
+**证据**（10/27）：`can't read "rep": no such variable`，但文件里明明有 `set rep ...`——
+它被粘进了 `proc usage {}`（只有参数个数不对时才执行），主流程永远读不到。
+
+**根因**：粘贴前光标停在那个 proc 里，`set` 变成了它的局部变量。
+
+**预防**：粘贴前确认光标在**顶层**（行首无缩进、不在任何 `{}` 内）；粘完搜一次变量名看它落在第几行。
+
+### 21. `dict get` 用错 dict → `key "xxx" not known in dictionary` ⭐⭐⭐
+
+**证据**（10/27）：拆 proc 后先报 `key "wns"`（用了 `$rep` 去取 `$summary` 的键），
+改完又报 `key "invalid"`（反过来把 `$rep` 的键写成 `$summary`）。
+
+**记牢**：`dict get` 缺键是**报错**，不是返回空串。两个 dict 各有各的键：
+
+| dict | 谁产 | 键 |
+|---|---|---|
+| `report` | `parse_report` | `design` `corner` `records` `invalid` |
+| `summary` | `compute_summary` | `wns` `tns` `violations` `worst_start` `worst_end` `paths` |
+
+**预防**：拆完 proc 立刻把这张表写进 `parser-design.md`，取值前对表。
+
 ---
 
 ## 二、核心语法速查

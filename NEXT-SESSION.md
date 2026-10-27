@@ -44,13 +44,17 @@
 
 **本周明确不做**（计划表已顺延）：Tk GUI、OOP 扩展、namespace 深挖、真实 OpenROAD 报告适配（除非环境现成）。
 
-**当前进度：**（每天更新这一行，2026-10-20 13:30 更新）
-- 已完成：`01_basics` / `02_list_string` / `03_proc_control` / `log_summary.tcl` / `report_summary.tcl`
-- **W3 完成线已达成**：`tests/run_tests.tcl` 的 `:104` 和 `:124` 都已指向 `$root`，实测 **PASS: 19  FAIL: 0**（全部打在自己代码上）
-- **闭卷重写已通过**（10/20 上午 45 min 从空文件写 `log_summary`，补 2 处后过 19/19）
-- **文档已补齐**：README 实测记录 + bug 记录 12 条；CHEATSHEET 新增 8 条坑（10~17）
-- 未做：W4 本体（拆 proc / `dict` / `lsort` / CSV / 格式变体 / `parser-design.md`）
-- 下一步：**W4 第 2 天下午**，见下方清单第 7-9 项
+**当前进度：**（每天更新这一行，2026-10-27 15:00 更新）
+- W3 全部完成（`log_summary` + `report_summary` + 19 条断言，两处 `set script` 指向 `$root`）
+- **W4 进行中**：`parse_report` 已拆出；`main` 分支 = **PASS: 19  FAIL: 0**，三份 fixture 输出与 W3 基线**逐字节一致**
+- **仓库已建**（10/27）：`main` = 绿的 19/0 版本；`wip/w4-tcl` = 半成品（`compute_summary` 已拆出，差 2 处）
+- **恢复半成品约 20 min**（下次开工第一件事）：
+  1. `git switch wip/w4-tcl`
+  2. 改 2 处：`:92` 的 `[dict get $summary invalid]` → `[dict get $rep invalid]`；在 `WORST_PATH` 与 `INVALID` 之间补 `puts "PATHS: [dict get $summary paths]"`
+  3. `run_tests` → 19/0、三份 `fc_exit` 全 0 → `git commit`
+  4. `git switch main` → `git merge wip/w4-tcl`
+- 未做：`write_csv` / CSV 落盘 / 批量 `glob` / 3-5 条变体 / 测试补断言 / `parser-design.md` / C 环形缓冲区 + Linux/Git 诊断 / M1 闭卷
+- 下一步：**10/28 早上补完上面 Tcl 的 5 项；W5（10/27-11/01）已压缩，SV 为主攻**
 
 ---
 
@@ -65,15 +69,18 @@
 - [x] 5. 闭卷重写 `log_summary.tcl`（45 min，补 2 处后过 19/19）
 - [x] 6. 补文档（README 实测记录 + 12 条 bug、CHEATSHEET 8 条新坑）
 
-### 待做：W4 本体
+### 待做：W4 本体（2026-10-27 15:00 状态）
 
-- [ ] 1. **拆 proc**（60 min）：`report_summary.tcl` → `parse_report` / `compute_summary` / `write_csv`
-- [ ] 2. **学并改用** `dict` + 嵌套 list + `lsort -command` + `format` + `source`（60 min）
+- [~] 1. **拆 proc**：`parse_report` ✅（`main`）；`compute_summary` 已拆出但差 2 处（`wip/w4-tcl`）；`write_csv` 未开始
+- [~] 2. **`dict` + 嵌套 list + `lsort -command` + `format` + `source`**：dict ✅（两个 proc 都返回 dict）、嵌套 list ✅（`records`）；`lsort -command` / `format` 对齐 / `source` 拆库 未做
 - [ ] 3. **批量目录**（45 min）：`glob` 遍历 `fixtures/*.rpt`，一次输出多份汇总
-- [ ] 4. **CSV / Markdown 汇总输出**（45 min）
-- [ ] 5. **格式变体测试**（45 min）：加单位 `-0.483ns`、改 `Slack` 大小写、缺字段 → 解析器不能静默算错
-- [ ] 6. **自动测试补到 5 条以上**（正常 / 无违例 / 负 slack / 字段缺失 / 文件不存在）
-- [ ] 7. **`parser-design.md`**（30 min）：输入假设、正则、数据结构、已知限制
+- [ ] 4. **CSV 汇总输出**（45 min）：Markdown 已决定砍掉
+- [ ] 5. **格式变体测试**（45 min）：加单位 `-0.483ns`、改 `Slack` 大小写、缺字段 → 解析器不能静默算错（先做 3 条）
+- [ ] 6. **自动测试补断言**：现有 6 个用例已覆盖 正常/无违例/负 slack/字段缺失/文件不存在；待补「批量」「CSV」「变体」的断言
+- [ ] 7. **`parser-design.md`**（30 min）：输入假设、正则、数据结构（两张 dict 键表）、已知限制
+- [x] 8. **git 建仓 + 提交**（10/27）：`main` 绿版本已提交
+- [ ] 9. **C 环形缓冲区 + Linux/Git 诊断**（3 h）→ 顺延到 10/31 或 11/01
+- [ ] 10. **M1 闭卷**（60-90 min，陌生报告）→ 11/01
 
 ### 已知但暂不修的小问题（不影响验收）
 
