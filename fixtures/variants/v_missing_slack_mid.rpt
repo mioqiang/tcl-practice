@@ -1,0 +1,8 @@
+# 设计: vtop   工艺角: slow_125c_1v08
+
+Startpoint: a_reg[0]
+Endpoint:   a_reg[1]
+
+Startpoint: b_reg[0]
+Endpoint:   b_reg[1]
+  slack (MET)               0.500

@@ -45,11 +45,13 @@ proc parse_report {path}   {
 while {[gets $fh line] >= 0} {
     set line [string trim $line]
     if {[regexp {^Startpoint:\s+(\S+)} $line -> v]} {
+        if {$cur_start ne ""} { incr INVALID}
         set cur_start $v
         set cur_end ""
     } elseif {[regexp {^Endpoint:\s+(\S+)} $line -> v]} {
         set cur_end $v
-    } elseif {[regexp {slack \((?:MET|VIOLATED)\)\s+(\S+)} $line -> v]} {
+    } elseif {[regexp -nocase {slack\s+\((?:MET|VIOLATED)\)\s+(\S+)} $line -> raw]} {
+        set v [regsub {[A-Za-z]+$} $raw ""]
         if {$cur_start ne "" && $cur_end ne "" && [string is double -strict $v]} {
                 lappend records [list $cur_start $cur_end $v]
         } else {
