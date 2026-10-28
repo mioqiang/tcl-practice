@@ -12,18 +12,28 @@ if {$argc < 1 || $argc > 2} {
     usage
     exit 1
 }
-
+#目录分支里不再 exit，只记 $mode。文件检查放进 else，这样它只对文件生效
 set path [lindex $argv 0]
-if {![file exists $path]} {
+if {$argc >= 2} {
+     set summaryFile [lindex $argv 1] } else {
+     set summaryFile "out/summary.csv" }
+set mode single
+if {[file isdirectory $path]} {
+    set mode  batch
+} else {
+   if {![file exists $path]} {
     puts stderr "Error:路径 \"$path\" 不存在"
     exit 1
-}
-if {[file size $path] == 0} {
+    }
+    if {[file size $path] == 0} {
     puts stderr "Error:路径 \"$path\" 存在但为空"
     exit 1
+    }
 }
 
+
 # dict {design corner records invalid}
+#文本转结构
 proc parse_report {path}   {
     set INVALID 0
     set fh [open $path r]
@@ -57,6 +67,7 @@ if {$cur_start ne ""} {
 close $fh
 return [dict create design $DESIGN corner $CORNER records $records invalid $INVALID] }
 
+#结构转指标
 proc compute_summary {report} {
     set wns 0.0
     set tns 0.0
@@ -80,6 +91,7 @@ proc compute_summary {report} {
                          paths [llength [dict get $report records]]]
 }
 
+#指标变表
 proc format_row {path rep summary} {
     set design [dict get $rep design]
     set corner [dict get $rep corner]
@@ -92,6 +104,7 @@ proc format_row {path rep summary} {
     return [list $fiile $design $corner $wns $tns $violations $worst_start $worst_end]
 }
 
+#表转文件
 proc write_csv {outfile rows} {
     file mkdir [file dirname $outfile]
     set fh [open $outfile w]
@@ -101,6 +114,37 @@ proc write_csv {outfile rows} {
         puts $fh [join $row ,]
     }
     close $fh
+}
+# set files [lsort $files]
+#     puts "MODE: batch"
+#     puts "DIR: $path"
+#     puts "FILES: [llength $files]"
+#     foreach f $files {puts $f}
+#     exit 0
+
+if {$mode eq "batch"} {
+    set files [glob -nocomplain [file join $path *.rpt]]
+    if {[llength $files] == 0} {
+        puts stderr "Error: 目录 \"$path\" 里没有 .rpt 文件"
+        exit 1
+    }
+    puts "MODE: batch"
+    puts "DIR: $path"
+    puts [format "%-28s %6s %11s %9s %9s" FILE PATHS VIOLATIONS WNS TNS]
+    set rows {}
+    set totalviol 0
+    set totalInvalid 0
+    foreach f $files {
+        set rep [parse_report $f]
+        set summary [compute_summary $rep]
+        lappend rows [format_row $f $rep $summary]
+        puts [format "%-28s %6d %11d %9.3f %9.3f" [file tail $f] [dict get $summary paths] [dict get $summary violations] [dict get $summary wns] [dict get $summary tns]]
+        incr totalviol [dict get $summary violations]
+        incr totalInvalid [dict get $rep invalid]
+    }
+    write_csv $summaryFile $rows
+    puts [format "TOTAL: %d files, %d violations, %d invalid" [llength $files] $totalviol $totalInvalid]
+    exit [expr {$totalInvalid > 0 ? 2 : 0}]
 }
 
 set rep [parse_report $path]
@@ -115,9 +159,7 @@ puts "WORST_PATH: [dict get $summary worst_start] -> [dict get $summary worst_en
 puts "PATHS: [dict get $summary paths]"
 puts "INVALID: [dict get $rep invalid]"
 
-if {$argc >= 2} {
-     set summaryFile [lindex $argv 1] } else {
-     set summaryFile "out/summary.csv" }
+
 write_csv $summaryFile [list [format_row $path $rep $summary]]
 
 if {[dict get $rep invalid] > 0} {
