@@ -24,7 +24,9 @@
   - 实测 XSim 支持 `interface`/`modport`/`clocking`/`program`/`virtual interface`/`class`/`rand`/`covergroup`（8/8）
   - 命令：`xvlog -sv` → `xelab -sv <top> -s <snap>` → `xsim <snap> -runall`（**必须 `-sv`**，文件不能带 BOM）
   - 器件：`xc7z020clg484-2`（Zynq-7020），工程 `D:\Vivado2024.2\AC880\mux2`
-  - SV 练习与笔记在**另一个仓库** `C:\Users\jyd10\Desktop\question\sv-lab`（`notes\toolchain.md` 有完整矩阵）
+  - **红线**：`D:\Vivado2024.2\AC880\` 下的 Vivado 工程**只读**（不移动/不修改/不往里生成文件），
+  实验一律在 sv-lab 的副本上做
+- SV 练习与笔记在**另一个仓库** `C:\Users\jyd10\Desktop\question\sv-lab`（`notes\toolchain.md` 有完整矩阵）
 
 **我的学习方式（重要，请遵守）：**
 - **我自己写代码，你不要直接给答案**；给我语法用法、思路提示、验收标准
