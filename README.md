@@ -132,7 +132,9 @@ set script [file join $root report_summary.tcl]    ;# 原先：$solutions
 ⚠️ **这两处要一起改**：只改第一处的话，`log_summary` 那 7 条是你的，`report_summary`
 那 12 条仍然是参考实现的——总分 19 看着漂亮，实际只有 7 条在验你的代码。
 
-当前基线：**PASS: 19  FAIL: 0**（2026-10-20 实测，两处都已指向根目录的自研实现）。
+当前基线：**PASS: 53  FAIL: 0**（2026-11-02 实测；19 条原有 + 27 变体 + 5 批量 + 2 错误路径）。
+每次改完跑两条：`python ..\tools\tclsh.py tests\run_tests.tcl` 和
+`powershell -ExecutionPolicy Bypass -File .\tests\verify_baseline.ps1`（后者逐字节比 3 份 W3 基线）。
 
 ### 实测记录（2026-10-20，本机实际运行结果）
 
@@ -182,6 +184,48 @@ PASS: 19   FAIL: 0
 **已知的输出瑕疵**（不影响断言，暂不修）：
 - `WORST_PATH:` 那行等号两边有空格（`slack = -0.483`），契约示例写的是 `slack=-0.483`；
 - 无违例的报告中 `WORST_PATH:  ->   slack = 0.000` 的两个路径名是空的。
+
+### 实测记录（2026-11-02，W4 收工）
+
+`report_summary.tcl` 已拆成 `parse_report` / `compute_summary` / `format_row` / `write_csv`，
+新增批量目录模式、CSV 落盘、9 条格式变体和 34 条断言。**单文件模式的 9 行输出与 W3 基线逐字节一致**
+（`.w4-baseline/` 的 `fc_exit` 全 0），所以上面的 2026-10-20 记录仍然有效。
+
+```text
+$ python ..\tools\tclsh.py report_summary.tcl fixtures
+MODE: batch
+DIR: fixtures
+FILE                          PATHS  VIOLATIONS       WNS       TNS
+timing_clean.rpt                  4           0     0.000     0.000
+timing_malformed.rpt              2           0     0.000     0.000
+timing_normal.rpt                 6           3    -0.483    -0.757
+TOTAL: 3 files, 3 violations, 3 invalid
+$ echo "exit=$LASTEXITCODE"
+exit=2
+```
+
+```text
+$ python ..\tools\tclsh.py tests\run_tests.tcl
+...
+PASS: 53   FAIL: 0
+全部通过
+```
+
+变体（`fixtures/variants/`，每条只偏离基准一处，验证"不会静默算错"）：
+
+| 变体 | paths | invalid | 退出码 | 验证点 |
+|---|---:|---:|---:|---|
+| v_canonical | 1 | 0 | 0 | 基准 |
+| v_unit_ns | 1 | 0 | 0 | `-0.300ns` 单位可剥 |
+| v_slack_case | 2 | 0 | 0 | `Slack` 大写不再丢路径 |
+| v_missing_slack_mid | 1 | 1 | 2 | 中间路径缺 slack 行 → 计入 invalid |
+| v_missing_endpoint | 0 | 1 | 2 | 缺 Endpoint |
+| v_na | 0 | 1 | 2 | `N/A` 判无效 |
+| v_plus_sign | 1 | 0 | 0 | `+0.120` 合法 |
+| v_thousand | 0 | 1 | 2 | 千分位判无效 |
+| v_multi_space | 1 | 0 | 0 | 多空格不错位 |
+
+完整设计说明（输入假设、正则、数据结构、14 条已知限制）见 [`parser-design.md`](parser-design.md)。
 
 ### 自动补全的开关（练习模式 vs 查 API 模式）
 
@@ -271,6 +315,32 @@ INVALID: 0
 ```
 
 退出码约定：`0` 成功；`1` 用法/文件不存在/空文件；`2` 数据里有问题（FAIL 或无效路径）。
+
+### 4.1 批量模式（W4 新增，参数是目录）
+
+```text
+MODE: batch
+DIR: fixtures
+FILE                          PATHS  VIOLATIONS       WNS       TNS
+timing_clean.rpt                  4           0     0.000     0.000
+timing_malformed.rpt              2           0     0.000     0.000
+timing_normal.rpt                 6           3    -0.483    -0.757
+TOTAL: 3 files, 3 violations, 3 invalid
+```
+
+- 文件顺序由 `lsort` 保证（**顺序也是契约**，CSV 行序可断言）；
+- 批量退出码：任一文件有无效路径 → `2`；目录里没有 `.rpt` → `1`；
+- 单文件模式的 9 行输出**不受影响**（`tests/verify_baseline.ps1` 逐字节比对）。
+
+### 4.2 CSV（8 列）
+
+```text
+file,design,corner,wns,tns,violations,worst_start,worst_end
+timing_clean.rpt,fifo_sync_top,fast_0c_1v32,0.000,0.000,0,,
+```
+
+无违例时最后两列是空字段，**逗号不能少**。默认写 `out/summary.csv`，可用第二个参数覆盖。
+设计说明与已知限制见 [`parser-design.md`](parser-design.md)。
 
 ---
 

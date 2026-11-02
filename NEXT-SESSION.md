@@ -41,27 +41,26 @@
 12. 粘贴 `set` 前确认光标在**顶层**，别落进别的 proc（会变成那个 proc 的局部变量）
 13. `dict get` 缺键 = **报错**；`report` 4 键（design/corner/records/invalid）、`summary` 6 键（wns/tns/violations/worst_start/worst_end/paths），别取错对象
 
-**现在要做的（按顺序）：**
-1. **20 min**：`git switch wip/w4-tcl` → 改 2 处 → 19/0 + 三份 `fc_exit` 全 0 → commit → 合回 `main`
-2. **45 min**：`write_csv` + CSV 落盘（列名见 README `:280`）
-3. **30 min**：批量 `glob`（目录入口，`report_summary.tcl fixtures` 一次出 3 份）
-4. **25 min**：3 条格式变体 + 在 `run_tests.tcl` 补断言
-5. **20 min**：`parser-design.md`（输入假设 / 正则 / 两张 dict 键表 / 已知限制）
-6. 之后全投 **W5 SV**：环境 → 参数化 MUX → 译码器 → 计数器 → 移位寄存器，每个模块配 `$error`/`$fatal` 自检 TB
+**现在要做的（按顺序，2026-11-02 更新）：**
+1. ~~Tcl 解析器 v1~~ —— **W4 全部完成**，见下面「当前进度」
+2. **全投 W5 SV**：环境（iverilog/verilator）→ 参数化 MUX → 译码器 → 计数器 → 移位寄存器，
+   每个模块配 `$error`/`$fatal` 自检 TB；装好后把版本号补进 `SV: 待填` 那一行
+3. 有余力再补（**不阻塞 SV**）：`lsort -command` 按 slack 排序打印违例、`source` 拆库、
+   C 环形缓冲区 + Linux/Git 诊断、M1 闭卷（陌生报告 90 min）
 
 **本周明确不做**：Markdown 输出、Tk GUI、OOP 扩展、namespace 深挖、真实 OpenROAD 报告适配、另一套验证环境。
 
-**当前进度：**（每天更新这一行，2026-10-27 15:00 更新）
-- W3 全部完成（`log_summary` + `report_summary` + 19 条断言，两处 `set script` 指向 `$root`）
-- **W4 进行中**：`parse_report` 已拆出；`main` 分支 = **PASS: 19  FAIL: 0**，三份 fixture 输出与 W3 基线**逐字节一致**
-- **仓库已建**（10/27）：`main` = 绿的 19/0 版本；`wip/w4-tcl` = 半成品（`compute_summary` 已拆出，差 2 处）
-- **恢复半成品约 20 min**（下次开工第一件事）：
-  1. `git switch wip/w4-tcl`
-  2. 改 2 处：`:92` 的 `[dict get $summary invalid]` → `[dict get $rep invalid]`；在 `WORST_PATH` 与 `INVALID` 之间补 `puts "PATHS: [dict get $summary paths]"`
-  3. `run_tests` → 19/0、三份 `fc_exit` 全 0 → `git commit`
-  4. `git switch main` → `git merge wip/w4-tcl`
-- 未做：`write_csv` / CSV 落盘 / 批量 `glob` / 3-5 条变体 / 测试补断言 / `parser-design.md` / C 环形缓冲区 + Linux/Git 诊断 / M1 闭卷
-- 下一步：**10/28 早上补完上面 Tcl 的 5 项；W5（10/27-11/01）已压缩，SV 为主攻**
+**当前进度：**（2026-11-02 更新）
+- **W3 完成**；**W4 完成**（Tcl 报告解析器 v1 收工）
+- `report_summary.tcl` 四个 proc：`parse_report` / `compute_summary` / `format_row` / `write_csv`
+- 能力：单文件 9 行契约 + 批量目录（`glob` + `lsort` + 表格 + `TOTAL`）+ 8 列 CSV 落盘 + 可选第二参数 outfile
+- 测试：**PASS: 53  FAIL: 0**（19 原有 + 27 变体 + 5 批量 + 2 错误路径）
+- 基线：`python ..\tools\tclsh.py tests\run_tests.tcl` 与
+  `powershell -ExecutionPolicy Bypass -File .\tests\verify_baseline.ps1`（3/3）**每次改动都要跑**
+- 变体：`fixtures/variants/` 9 条（单位 / 大小写 / 缺 slack / 缺 Endpoint / N/A / 正号 / 千分位 / 多空格 / 基准）
+- 文档：`parser-design.md`（输入假设 / 正则 / 数据结构 / 不变式 / 14 条已知限制 / 决策记录 / 测试矩阵）
+- 已知不做：`lsort -command` 排序输出、`source` 拆库、C 环形缓冲区、Linux/Git 诊断、M1 闭卷（都顺延，不阻塞 SV）
+- **下一步：W5 SystemVerilog**（已逾期，今天是 11/02）
 
 ---
 
@@ -76,18 +75,19 @@
 - [x] 5. 闭卷重写 `log_summary.tcl`（45 min，补 2 处后过 19/19）
 - [x] 6. 补文档（README 实测记录 + 12 条 bug、CHEATSHEET 8 条新坑）
 
-### 待做：W4 本体（2026-10-27 15:00 状态）
+### W4 本体（2026-11-02 收工）
 
-- [~] 1. **拆 proc**：`parse_report` ✅（`main`）；`compute_summary` 已拆出但差 2 处（`wip/w4-tcl`）；`write_csv` 未开始
-- [~] 2. **`dict` + 嵌套 list + `lsort -command` + `format` + `source`**：dict ✅（两个 proc 都返回 dict）、嵌套 list ✅（`records`）；`lsort -command` / `format` 对齐 / `source` 拆库 未做
-- [ ] 3. **批量目录**（45 min）：`glob` 遍历 `fixtures/*.rpt`，一次输出多份汇总
-- [ ] 4. **CSV 汇总输出**（45 min）：Markdown 已决定砍掉
-- [ ] 5. **格式变体测试**（45 min）：加单位 `-0.483ns`、改 `Slack` 大小写、缺字段 → 解析器不能静默算错（先做 3 条）
-- [ ] 6. **自动测试补断言**：现有 6 个用例已覆盖 正常/无违例/负 slack/字段缺失/文件不存在；待补「批量」「CSV」「变体」的断言
-- [ ] 7. **`parser-design.md`**（30 min）：输入假设、正则、数据结构（两张 dict 键表）、已知限制
-- [x] 8. **git 建仓 + 提交**（10/27）：`main` 绿版本已提交
-- [ ] 9. **C 环形缓冲区 + Linux/Git 诊断**（3 h）→ 顺延到 10/31 或 11/01
-- [ ] 10. **M1 闭卷**（60-90 min，陌生报告）→ 11/01
+- [x] 1. **拆 proc**：`parse_report` / `compute_summary` / `format_row` / `write_csv`（4 个）
+- [x] 2. **`dict` + 嵌套 list + `format`**：两个 dict、`records` 三元组、`format` 列宽对齐表头
+      （`lsort -command` / `source` 拆库未做 → 顺延，不影响验收）
+- [x] 3. **批量目录**：`glob -nocomplain` + `lsort`，`report_summary.tcl fixtures` 一次出 3 份 + `TOTAL` 行
+- [x] 4. **CSV 汇总输出**：8 列 `out/summary.csv`，`w` 模式幂等
+- [x] 5. **格式变体测试**：`fixtures/variants/` **9 条**（单位 / `Slack` 大小写 / 中间缺 slack / 缺 Endpoint / `N/A` / 正号 / 千分位 / 多空格 / 基准）
+- [x] 6. **自动测试补断言**：**53 条**（+27 变体、+5 批量、+2 错误路径）
+- [x] 7. **`parser-design.md`**：输入假设 / 正则清单 / 数据结构 / 不变式 / 14 条已知限制 / 决策记录 / 测试矩阵
+- [x] 8. **git 建仓 + 提交**（10/27 起）：`main` 全绿
+- [ ] 9. **C 环形缓冲区 + Linux/Git 诊断**（3 h）→ 顺延
+- [ ] 10. **M1 闭卷**（60-90 min，陌生报告）→ 顺延，不阻塞 SV
 
 ### 已知但暂不修的小问题（不影响验收）
 
