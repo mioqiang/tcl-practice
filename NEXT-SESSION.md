@@ -13,12 +13,18 @@
 - `wip/w4-tcl` = 半成品：`compute_summary` 已拆出，**只差 2 处**（哪 2 处写在下面「当前进度」）
 - `report_summary.tcl` 已有 `parse_report` / `compute_summary`；`write_csv` 还没写
 - 测试：`python ..\tools\tclsh.py tests\run_tests.tcl` → 期望 19/0
-- 回归基线：`C:\Users\jyd10\Desktop\question\.w4-baseline\timing_*.txt`，用 `fc.exe` 比，**判据是退出码**（`fc` 无差异时也返回 0 并打印提示，别按“有没有输出”判断）
+- 回归基线：仓库内自带 `tests\baseline\timing_*.txt`（`..\.w4-baseline\` 为旧位置，脚本会先找仓库内的），
+  用 `fc.exe` 比，**判据是退出码**（`fc` 无差异时也返回 0 并打印提示，别按“有没有输出”判断）
 
 **我的环境：**
 - Windows，VS Code（`D:\Microsoft VS Code`），Tcl 扩展 `bitwisecook.tcl-lsp`
-- 没有 tclsh：`python ..\tools\tclsh.py <脚本> [参数]`（工作目录 `tcl-practice`）
-- SV 仿真器（iverilog/verilator）在 10/27 下午配，装好后把版本号补进这一行：`SV: 待填`
+- 没有 tclsh：`python ..\tools\tclsh.py <脚本> [参数]`（工作目录 `tcl-practice`；
+  仓库里也带了一份 `tools\tclsh.py`，clone 下来可直接跑）
+- **SV/FPGA 环境**：`SV: Vivado ML 2024.2 / XSim v2024.2.0`（本机唯一仿真器；iverilog/verilator 都没装）
+  - 实测 XSim 支持 `interface`/`modport`/`clocking`/`program`/`virtual interface`/`class`/`rand`/`covergroup`（8/8）
+  - 命令：`xvlog -sv` → `xelab -sv <top> -s <snap>` → `xsim <snap> -runall`（**必须 `-sv`**，文件不能带 BOM）
+  - 器件：`xc7z020clg484-2`（Zynq-7020），工程 `D:\Vivado2024.2\AC880\mux2`
+  - SV 练习与笔记在**另一个仓库** `C:\Users\jyd10\Desktop\question\sv-lab`（`notes\toolchain.md` 有完整矩阵）
 
 **我的学习方式（重要，请遵守）：**
 - **我自己写代码，你不要直接给答案**；给我语法用法、思路提示、验收标准
