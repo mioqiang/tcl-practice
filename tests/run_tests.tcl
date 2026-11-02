@@ -94,7 +94,12 @@ proc field {text key} {
     }
     return ""
 }
-
+proc slurp {path} {
+    set fh [open $path r]
+    set data [read $fh]
+    close $fh
+    return $data
+}
 # ---------------------------------------------------------------- 测试用例
 puts "runner : $runner"
 puts "fixtures: $fixtures"
@@ -144,6 +149,53 @@ lassign [run_cmd [concat $runner [list $script [file join $fixtures timing_malfo
 report "坏数据 退出码=2" [expr {$rc == 2}] "实际 rc=$rc ; stderr=$err"
 report "坏数据 INVALID>0" [expr {[field $out INVALID] ne "" && [field $out INVALID] > 0}] "INVALID=[field $out INVALID]"
 
+#表驱体
+puts ""
+puts "== 变体(格式容错) =="
+set vdir [file join $fixtures variants]
+set outcsv [file join $root out _test.csv]
+set vcases {
+    {v_canonical.rpt            0 1 0}
+    {v_unit_ns.rpt              0 1 0}
+    {v_slack_case.rpt           0 2 0}
+    {v_missing_slack_mid.rpt    2 1 1}
+    {v_missing_endpoint.rpt     2 0 1}
+    {v_na.rpt                   2 0 1}
+    {v_plus_sign.rpt            0 1 0}
+    {v_thousand.rpt             2 0 1}
+    {v_multi_space.rpt          0 1 0}
+}
+
+foreach c $vcases {
+    lassign $c name eexit epaths einvalid
+    lassign [run_cmd [concat $runner [list $script [file join $vdir $name] $outcsv]]] rc out err
+    report "变体 $name 退出码=$eexit" [expr {$rc == $eexit}] "实际 rc=$rc ; stderr=$err"
+    report "变体 $name PATHS=$epaths"  [string equal [field $out PATHS] $epaths]   "PATHS=[field $out PATHS]"
+    report "变体 $name INVALID=$einvalid" [string equal [field $out INVALID] $einvalid] "INVALID=[field $out INVALID]"
+}
+puts ""
+puts "== 批量目录 =="
+set batchcsv [file join $root out _batch.csv]
+lassign [run_cmd [concat $runner [list $script $fixtures $batchcsv]]] rc out err
+
+report "批量 退出码=2（含 malformed）" [expr {$rc == 2}] "实际 rc=$rc ; stderr=$err"
+report "批量 TOTAL 行" [regexp {TOTAL:\s*3 files,\s*3 violations,\s*3 invalid} $out] "输出: $out"
+
+set lines [split [string trim [slurp $batchcsv]] "\n"]
+report "批量 CSV 行数=4" [expr {[llength $lines] == 4}] "实际 [llength $lines] 行"
+report "批量 CSV 表头 8 列" [expr {[llength [split [lindex $lines 0] ,]] == 8}] "表头=[lindex $lines 0]"
+report "批量 CSV 按文件名排序" [expr {[lindex [split [lindex $lines 1] ,] 0] eq "timing_clean.rpt"}] "第 2 行=[lindex $lines 1]"
+
+puts ""
+puts "== 错误路径 =="
+set emptydir [file join $root out _empty_dir]
+file mkdir $emptydir
+lassign [run_cmd [concat $runner [list $script $emptydir]]] rc out err
+report "空目录 退出码=1" [expr {$rc == 1}] "实际 rc=$rc"
+file delete -force $emptydir
+
+lassign [run_cmd [concat $runner [list $script [file join $fixtures no_such_dir]]]] rc out err
+report "目录不存在 退出码=1" [expr {$rc == 1}] "实际 rc=$rc"
 # ---------------------------------------------------------------- 汇总
 puts ""
 puts "=================================================="
