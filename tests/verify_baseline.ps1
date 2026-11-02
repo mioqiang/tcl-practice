@@ -26,8 +26,15 @@ $ErrorActionPreference = 'Stop'
 $testsDir = $PSScriptRoot
 $root     = Split-Path -Parent $testsDir                       # ...\tcl-practice
 $workRoot = Split-Path -Parent $root                           # ...\question
-$baseDir  = Join-Path $workRoot '.w4-baseline'
-$tclsh    = Join-Path $workRoot 'tools\tclsh.py'
+
+# 基线优先用仓库内的一份（tests\baseline，clone 下来即可跑），
+# 没有再退回工作区的 ..\.w4-baseline
+$baseDir = Join-Path $testsDir 'baseline'
+if (-not (Test-Path $baseDir)) { $baseDir = Join-Path $workRoot '.w4-baseline' }
+
+$tclsh = Join-Path $root 'tools\tclsh.py'
+if (-not (Test-Path $tclsh)) { $tclsh = Join-Path $workRoot 'tools\tclsh.py' }
+
 $parser   = Join-Path $root 'report_summary.tcl'
 $outDir   = Join-Path $root 'out\verify'
 

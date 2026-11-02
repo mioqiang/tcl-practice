@@ -93,9 +93,18 @@ tcl-practice/
 ├── solutions/                    ← 参考实现（先自己写，卡住再对照）
 │   ├── log_summary.tcl
 │   └── report_summary.tcl
+├── parser-design.md              ← W4 交付：输入假设 / 正则 / 数据结构 / 14 条已知限制
+├── tools/
+│   └── tclsh.py                  ← 仓库自带一份（clone 下来即可跑，不依赖上级目录）
 └── tests/
-    └── run_tests.tcl             ← 一条命令跑完 19 项断言，失败退出码非 0
+    ├── run_tests.tcl             ← 一条命令跑完 53 项断言，失败退出码非 0
+    ├── verify_baseline.ps1       ← 三份 fixture 与基线逐字节比对（fc 退出码全 0 才算过）
+    └── baseline/                 ← W3 基线（timing_*.txt，UTF-16LE）
 ```
+
+> **可独立运行**：`tools/tclsh.py` 和 `tests/baseline/` 都在仓库里，
+> `git clone` 到任意目录后直接 `python tools\tclsh.py tests\run_tests.tcl` 就能跑（53 条断言）。
+> 两个脚本都会优先找仓库内的路径，找不到再回退到工作区布局（`..\tools\`、`..\.w4-baseline\`）。
 
 ---
 

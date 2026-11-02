@@ -26,12 +26,18 @@ proc find_tclsh {} {
     if {[llength [auto_execok tclsh]] > 0} {
         return [auto_execok tclsh]
     }
-    # 回退：python <repo>/tools/tclsh.py
+    # 回退：python + tclsh.py。两个候选：
+    #   <repo>/../tools/tclsh.py —— 本机工作区布局（question/tools/tclsh.py）
+    #   <repo>/tools/tclsh.py    —— clone 下来即可用（仓库内自带一份）
     set py [auto_execok python]
     set here [file normalize [file dirname [info script]]]
-    set cand [file normalize [file join $here .. .. tools tclsh.py]]
-    if {[llength $py] > 0 && [file exists $cand]} {
-        return [concat $py [list $cand]]
+    set cands [list \
+        [file normalize [file join $here .. .. tools tclsh.py]] \
+        [file normalize [file join $here .. tools tclsh.py]]]
+    foreach cand $cands {
+        if {[llength $py] > 0 && [file exists $cand]} {
+            return [concat $py [list $cand]]
+        }
     }
     error "找不到 tclsh。请设置环境变量 TCLSH，或安装 Tcl（apt install tcl）。"
 }
